@@ -1237,8 +1237,7 @@ EOF
     if [[ -z $password ]]; then
         [[ -f $webdirdest/lib/fog/config.class.php ]] && password=$(awk -F '"' -e '/TFTP_FTP_PASSWORD/,/);/{print $2}' $webdirdest/lib/fog/config.class.php | grep -v "^$")
     fi
-    passcheck=$(echo $password | tr -d '0-9a-zA-Z!#$%&()*+,-./:;<=>?@[\\]^_{|}~')
-    if [[ -n "$passcheck" ]]
+    if [[ -n "$(checkPasswordChars)" ]]
     then
         echo "Failed"
         echo "# The fog system account password includes characters we cannot properly"
@@ -1250,7 +1249,7 @@ EOF
     ret=999
     while [[ $ret -ne 0 && $cnt -lt 10 ]]
     do
-        [[ -z $password || $ret -ne 999 ]] && password=$(tr -cd '0-9a-zA-Z!#$%&()*+,-./:;<=>?@[\\]^_{|}~' < /dev/urandom | fold -w12 | head -n1)
+        [[ -z $password || $ret -ne 999 ]] && password=$(generatePassword)
         echo -e "$password\n$password" | passwd $username >>$workingdir/error_logs/fog_error_${version}.log 2>&1
         ret=$?
         let cnt+=1
@@ -2368,4 +2367,12 @@ languagemogen() {
             "${langpath}/${lang}.UTF-8/LC_MESSAGES/messages.po" \
             >>$workingdir/error_logs/fog_error_${version}.log 2>&1
     done
+}
+generatePassword() {
+  pass=$(tr -cd '0-9a-zA-Z!#$%&()*+,-./:;<=>?@[\\]^_{|}~' < /dev/urandom | fold -w12 | head -n1)
+  return $pass
+}
+checkPasswordChars() {
+    passcheck=$(echo $1 | tr -d '0-9a-zA-Z!#$%&()*+,-./:;<=>?@[\\]^_{|}~')
+    return $passcheck
 }
