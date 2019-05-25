@@ -2369,10 +2369,8 @@ languagemogen() {
     done
 }
 generatePassword() {
-  pass=$(tr -cd '0-9a-zA-Z!#$%&()*+,-./:;<=>?@[\\]^_{|}~' < /dev/urandom | fold -w12 | head -n1)
-  return $pass
+  tr -cd '0-9a-zA-Z!#$%&()*+,-./:;<=>?@[\\]^_{|}~' < /dev/urandom | fold -w12 | head -n1
 }
 checkPasswordChars() {
-    passcheck=$(echo $1 | tr -d '0-9a-zA-Z!#$%&()*+,-./:;<=>?@[\\]^_{|}~')
-    return $passcheck
+    echo $1 | tr -d '0-9a-zA-Z!#$%&()*+,-./:;<=>?@[\\]^_{|}~'
 }
